@@ -45,8 +45,30 @@ class BookController {
             $precio = $_POST["precio"];
             $id_cat = $_POST["Sel_cat"];
             
+            // Procesar la imagen
+            $cover_image = null; // Valor predeterminado si no hay imagen
+            if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] == 0) {
+            // Directorio donde se guardarán las imágenes
+            $uploadDir = 'public/img/books/';
+            
+            // Asegúrate de que el directorio exista
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            // Generar nombre único para el archivo
+            $filename = uniqid('book_') . '_' . pathinfo($_FILES['cover_image']['name'], PATHINFO_FILENAME);
+            $extension = strtolower(pathinfo($_FILES['cover_image']['name'], PATHINFO_EXTENSION));
+            $targetPath = $uploadDir . $filename . '.' . $extension;
+            
+            // Mover el archivo cargado
+            if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $targetPath)) {
+                $cover_image = $targetPath;
+            }
+        }
+
             // inserto la tarea en la DB
-            $id = $this->model->insert($titulo, $autor,  $precio, $id_cat);
+            $id = $this->model->insert($titulo, $autor,  $precio, $cover_image, $id_cat);
             // redirigimos al listado
             $libros = $this->model->getAll();
             $message = "¡Libro insertado con exito!";
@@ -84,9 +106,35 @@ class BookController {
 
     //Actualiza la base de datos del ID enviado. SOLO ADMIN
     function modif_final() {
-        $libro = array("id"=>$_POST["id"], "titulo"=>$_POST["titulo"], "autor"=>$_POST["autor"], "precio"=>$_POST["precio"], 
-                       "categoria"=>$_POST["Sel_cat"]);
+        $libro = array(
+            "id"=>$_POST["id"], 
+            "titulo"=>$_POST["titulo"], 
+            "autor"=>$_POST["autor"], 
+            "precio"=>$_POST["precio"],
+            "categoria"=>$_POST["Sel_cat"]);
+
+        // Procesar la imagen subida (si existe)
+        if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] == 0) {
+            $uploadDir = 'public/img/books/';
+            
+            // Asegurarse de que el directorio exista
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            // Generar nombre único para el archivo
+            $filename = uniqid('book_') . '_' . pathinfo($_FILES['cover_image']['name'], PATHINFO_FILENAME);
+            $extension = strtolower(pathinfo($_FILES['cover_image']['name'], PATHINFO_EXTENSION));
+            $targetPath = $uploadDir . $filename . '.' . $extension;
+            
+            // Mover el archivo cargado
+            if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $targetPath)) {
+                $libro["cover_image"] = $targetPath;
+            }
+        }
+        // Actualizar el libro en la base de datos
         $libros = $this->model->updateLibro($libro);
+        // Mostrar la página actualizada
         $categorias = $this->modelcat->getAll();
         $message = "¡Libro modificado con exito!";
         $this->view->showMenuAdmin($libros, $categorias, $message);

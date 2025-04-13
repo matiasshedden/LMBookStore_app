@@ -12,12 +12,13 @@
     <h2>Menu del Administrador</h2>
 </div>
 
+{include 'templates/book_form.tpl'}
+
 {* Titulo del listado de libros *}
 <div class='container mb-3'>
     <h3>Libros:</h3>
 </div>
-
-{* Aca empieza la funcion Insertar libros *}
+{* Aca empieza la funcion Insertar libros 
 <div class='container mb-3'>
     <form name="enviar" action="insertar" method="POST">
         <input type="text" name="titulo" placeholder="titulo" required>
@@ -30,7 +31,7 @@
         <select>
         <button class='btn btn-success btn-sm' type="submit">Insertar libro</button>
     </form>
-</div>
+</div>*}
 
 {* Aca empieza el listado de libros *}
 <div id="contenedor" class='container mb-3'>
@@ -43,8 +44,8 @@
                 PRECIO: {$libro->precio} <br>
                 CATEGORIA: {$libro->nombre}
                 <div>
-                    <a class="btn btn-secondary" href="{BASE_URL}modificar/{$libro->id}">Modificar</a>
-                    <a class="btn btn-danger" href="{BASE_URL}eliminar/{$libro->id}">Eliminar</a>
+                    <a class="btn btn-secondary btn-sm" href="{BASE_URL}modificar/{$libro->id}">Modificar</a>
+                    <a class="btn btn-danger btn-sm" href="{BASE_URL}eliminar/{$libro->id}">Eliminar</a>
                 </div>
             </li>
         {/foreach}
@@ -72,8 +73,8 @@
             <li class='list-group-item'>
                 ID: {$categoria->ide} <br>
                 NOMBRE: {$categoria->nombre} <br> 
-                <a class="btn btn-secondary" href="{BASE_URL}modificarCategoria/{$categoria->ide}">Modificar</a>
-                <a class="btn btn-danger" href="{BASE_URL}eliminarCategoria/{$categoria->ide}">Eliminar</a>
+                <a class="btn btn-secondary btn-sm" href="{BASE_URL}modificarCategoria/{$categoria->ide}">Modificar</a>
+                <a class="btn btn-danger btn-sm" href="{BASE_URL}eliminarCategoria/{$categoria->ide}">Eliminar</a>
             </li>
         {/foreach}
     </ul>

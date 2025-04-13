@@ -35,11 +35,11 @@ class BooksModel {
     /**
      * Inserta el libro en la base de datos.
      */
-    function insert($titulo, $autor, $precio, $id_cat) {
+    function insert($titulo, $autor, $precio, $cover_image = null, $id_cat) {
         
         // 2. Enviar la consulta (2 sub-pasos: prepare y execute)
-        $query = $this->db->prepare('INSERT INTO libro (titulo, autor, precio, id_categoria) VALUES (?,?,?,?)');
-        $query->execute([$titulo, $autor, $precio, $id_cat]);
+        $query = $this->db->prepare('INSERT INTO libro (titulo, autor, precio, cover_image, id_categoria) VALUES (?,?,?,?,?)');
+        $query->execute([$titulo, $autor, $precio, $cover_image, $id_cat]);
 
         // 3. Obtengo y devuelo el ID de la tarea nueva
         return $this->db->lastInsertId();
@@ -112,10 +112,18 @@ class BooksModel {
         $titulo = $libro["titulo"];
         $autor = $libro["autor"];
         $precio = $libro["precio"];
+        $cover_image = $libro["cover_image"];
         $categoria = $libro["categoria"];
-        $query = $this->db->prepare('UPDATE libro JOIN categoria SET titulo = ?, autor = ?, precio = ?, id_categoria = ? WHERE id = ?');
-        $query->execute([$titulo, $autor, $precio, $categoria, $id]);
-        $libros = $this->getAll(); // arreglo de libros
+        // Verificar si existe la clave cover_image en el array
+        $cover_image = isset($libro["cover_image"]) ? $libro["cover_image"] : null;
+        if ($cover_image != null) {
+            $query = $this->db->prepare('UPDATE libro SET titulo = ?, autor = ?, precio = ?, cover_image = ?, id_categoria = ? WHERE id = ?');
+            $query->execute([$titulo, $autor, $precio, $cover_image, $categoria, $id]);
+        } else {
+            $query = $this->db->prepare('UPDATE libro SET titulo = ?, autor = ?, precio = ?, id_categoria = ? WHERE id = ?');
+            $query->execute([$titulo, $autor, $precio, $categoria, $id]);
+        }
+        $libros = $this->getAll();   // arreglo de libros
         return $libros;
     } 
 }
